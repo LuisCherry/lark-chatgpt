@@ -43,7 +43,7 @@ type ChatGPTRequestBody struct {
 
 func (gpt ChatGPT) Completions(msg []Messages) (resp Messages, err error) {
 	requestBody := ChatGPTRequestBody{
-		Model:            engine,
+		Model:            gpt.Model,
 		Messages:         msg,
 		MaxTokens:        maxTokens,
 		Temperature:      temperature,

@@ -2,7 +2,7 @@ module start-feishubot
 
 go 1.18
 
-require github.com/larksuite/oapi-sdk-go/v3 v3.0.14
+require github.com/larksuite/oapi-sdk-go/v3 v3.4.17
 
 require (
 	github.com/gin-gonic/gin v1.8.2

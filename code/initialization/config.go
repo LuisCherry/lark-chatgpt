@@ -22,6 +22,7 @@ type Config struct {
 	CertFile                   string
 	KeyFile                    string
 	OpenaiApiUrl               string
+	OpenaiModel                string
 	HttpProxy                  string
 }
 
@@ -62,8 +63,8 @@ func getViperStringValue(key string, defaultValue string) string {
 	return value
 }
 
-//OPENAI_KEY: sk-xxx,sk-xxx,sk-xxx
-//result:[sk-xxx sk-xxx sk-xxx]
+// OPENAI_KEY: sk-xxx,sk-xxx,sk-xxx
+// result:[sk-xxx sk-xxx sk-xxx]
 func getViperStringArray(key string, defaultValue []string) []string {
 	value := viper.GetString(key)
 	if value == "" {
