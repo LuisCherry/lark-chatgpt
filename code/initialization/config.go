@@ -49,6 +49,7 @@ func LoadConfig(cfg string) *Config {
 		CertFile:                   getViperStringValue("CERT_FILE", "cert.pem"),
 		KeyFile:                    getViperStringValue("KEY_FILE", "key.pem"),
 		OpenaiApiUrl:               getViperStringValue("API_URL", "https://api.openai.com"),
+		OpenaiModel:                getViperStringValue("MODEL", "deepseek-chat"),
 		HttpProxy:                  getViperStringValue("HTTP_PROXY", ""),
 	}
 
