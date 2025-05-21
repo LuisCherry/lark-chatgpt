@@ -212,6 +212,11 @@ type MessageAction struct { /*消息*/
 
 func (*MessageAction) Execute(a *ActionInfo) bool {
 	msg := a.handler.sessionCache.GetMsg(*a.info.sessionId)
+	if msg == nil || len(msg) == 0 {
+		msg = append(msg, openai.Messages{
+			Role: "system", Content: "回答中如需使用 Markdown，请避免使用标题语法（例如 #、##、###、#### 开头），以防渲染异常。可用其他格式如加粗、项目符号等代替",
+		})
+	}
 	msg = append(msg, openai.Messages{
 		Role: "user", Content: a.info.qParsed,
 	})
