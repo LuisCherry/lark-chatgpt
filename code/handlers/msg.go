@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
-	"encoding/json"
 	"fmt"
 	"github.com/google/uuid"
 	larkcard "github.com/larksuite/oapi-sdk-go/v3/card"
@@ -723,95 +722,4 @@ func sendVarImageCard(ctx context.Context, imageKey string,
 		newCard,
 	)
 	return nil
-}
-
-func convertMarkdownToLarkPostJson(markdown string) (string, error) {
-	lines := strings.Split(markdown, "\n")
-	var content [][]map[string]interface{}
-	var paragraph []map[string]interface{}
-	inCode := false
-	var codeBlock []string
-
-	flushParagraph := func() {
-		if len(paragraph) > 0 {
-			content = append(content, paragraph)
-			paragraph = nil
-		}
-	}
-
-	for _, line := range lines {
-		trimmed := strings.TrimSpace(line)
-
-		if strings.HasPrefix(trimmed, "```") {
-			if !inCode {
-				flushParagraph()
-				inCode = true
-				codeBlock = nil
-			} else {
-				inCode = false
-				flushParagraph()
-				content = append(content, []map[string]interface{}{
-					{"tag": "code", "text": strings.Join(codeBlock, "\n")},
-				})
-			}
-			continue
-		}
-
-		if inCode {
-			codeBlock = append(codeBlock, line)
-			continue
-		}
-
-		if trimmed == "" {
-			flushParagraph()
-			continue
-		}
-
-		// 标题处理
-		var level string
-		switch {
-		case strings.HasPrefix(trimmed, "# "):
-			level = "heading1"
-			trimmed = strings.TrimPrefix(trimmed, "# ")
-		case strings.HasPrefix(trimmed, "## "):
-			level = "heading2"
-			trimmed = strings.TrimPrefix(trimmed, "## ")
-		case strings.HasPrefix(trimmed, "### "):
-			level = "heading3"
-			trimmed = strings.TrimPrefix(trimmed, "### ")
-		case strings.HasPrefix(trimmed, "#### "):
-			level = "heading4"
-			trimmed = strings.TrimPrefix(trimmed, "#### ")
-		}
-		if level != "" {
-			flushParagraph()
-			content = append(content, []map[string]interface{}{
-				{"tag": level, "text": trimmed},
-			})
-			continue
-		}
-
-		// 列表项
-		if strings.HasPrefix(trimmed, "- ") {
-			trimmed = "• " + strings.TrimPrefix(trimmed, "- ")
-		}
-
-		paragraph = append(paragraph, map[string]interface{}{
-			"tag":  "text",
-			"text": trimmed,
-		})
-	}
-	flushParagraph()
-
-	data := map[string]interface{}{
-		"zh_cn": map[string]interface{}{
-			"title":   "AI 回复",
-			"content": content,
-		},
-	}
-	jsonBytes, err := json.Marshal(data)
-	if err != nil {
-		return "", err
-	}
-	return string(jsonBytes), nil
 }
