@@ -214,7 +214,7 @@ func (*MessageAction) Execute(a *ActionInfo) bool {
 	msg := a.handler.sessionCache.GetMsg(*a.info.sessionId)
 	if msg == nil || len(msg) == 0 {
 		msg = append(msg, openai.Messages{
-			Role: "system", Content: "回答中如需使用 Markdown，请避免使用标题语法（例如 #、##、###、#### 开头），以防渲染异常。可用其他格式如加粗、项目符号等代替",
+			Role: "system", Content: "你是一个智能问答助手，负责为用户提供清晰、准确的回答。回答内容可根据需要使用 Markdown 格式来组织，但严禁使用标题语法（即以 #、##、###、#### 开头的内容），因为这会导致页面渲染异常。请改用加粗、项目符号或分隔线来表达结构层级。\n❌ 错误示例：### 注意事项\n✅ 推荐写法：**注意事项**",
 		})
 	}
 	msg = append(msg, openai.Messages{
