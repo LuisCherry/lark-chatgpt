@@ -4,13 +4,14 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
-	"start-feishubot/initialization"
-	"start-feishubot/services"
-
 	"github.com/google/uuid"
 	larkcard "github.com/larksuite/oapi-sdk-go/v3/card"
 	larkim "github.com/larksuite/oapi-sdk-go/v3/service/im/v1"
+	"start-feishubot/initialization"
+	"start-feishubot/services"
+	"strings"
 )
 
 type CardKind string
@@ -358,16 +359,20 @@ func replyMsg(ctx context.Context, msg string, msgId *string) error {
 		return i
 	}
 	client := initialization.GetLarkClient()
-	content := larkim.NewTextMsgBuilder().
-		Text(msg).
-		Build()
+	contentStr, err := convertMarkdownToLarkPostJson(msg)
+	if err != nil {
+		return err
+	}
+	//content := larkim.NewTextMsgBuilder().
+	//	Text(msg).
+	//	Build()
 
 	resp, err := client.Im.Message.Reply(ctx, larkim.NewReplyMessageReqBuilder().
 		MessageId(*msgId).
 		Body(larkim.NewReplyMessageReqBodyBuilder().
 			MsgType(larkim.MsgTypeText).
 			Uuid(uuid.New().String()).
-			Content(content).
+			Content(contentStr).
 			Build()).
 		Build())
 
@@ -685,4 +690,95 @@ func sendVarImageCard(ctx context.Context, imageKey string,
 		newCard,
 	)
 	return nil
+}
+
+func convertMarkdownToLarkPostJson(markdown string) (string, error) {
+	lines := strings.Split(markdown, "\n")
+	var content [][]map[string]interface{}
+	var paragraph []map[string]interface{}
+	inCode := false
+	var codeBlock []string
+
+	flushParagraph := func() {
+		if len(paragraph) > 0 {
+			content = append(content, paragraph)
+			paragraph = nil
+		}
+	}
+
+	for _, line := range lines {
+		trimmed := strings.TrimSpace(line)
+
+		if strings.HasPrefix(trimmed, "```") {
+			if !inCode {
+				flushParagraph()
+				inCode = true
+				codeBlock = nil
+			} else {
+				inCode = false
+				flushParagraph()
+				content = append(content, []map[string]interface{}{
+					{"tag": "code", "text": strings.Join(codeBlock, "\n")},
+				})
+			}
+			continue
+		}
+
+		if inCode {
+			codeBlock = append(codeBlock, line)
+			continue
+		}
+
+		if trimmed == "" {
+			flushParagraph()
+			continue
+		}
+
+		// 标题处理
+		var level string
+		switch {
+		case strings.HasPrefix(trimmed, "# "):
+			level = "heading1"
+			trimmed = strings.TrimPrefix(trimmed, "# ")
+		case strings.HasPrefix(trimmed, "## "):
+			level = "heading2"
+			trimmed = strings.TrimPrefix(trimmed, "## ")
+		case strings.HasPrefix(trimmed, "### "):
+			level = "heading3"
+			trimmed = strings.TrimPrefix(trimmed, "### ")
+		case strings.HasPrefix(trimmed, "#### "):
+			level = "heading4"
+			trimmed = strings.TrimPrefix(trimmed, "#### ")
+		}
+		if level != "" {
+			flushParagraph()
+			content = append(content, []map[string]interface{}{
+				{"tag": level, "text": trimmed},
+			})
+			continue
+		}
+
+		// 列表项
+		if strings.HasPrefix(trimmed, "- ") {
+			trimmed = "• " + strings.TrimPrefix(trimmed, "- ")
+		}
+
+		paragraph = append(paragraph, map[string]interface{}{
+			"tag":  "text",
+			"text": trimmed,
+		})
+	}
+	flushParagraph()
+
+	data := map[string]interface{}{
+		"zh_cn": map[string]interface{}{
+			"title":   "AI 回复",
+			"content": content,
+		},
+	}
+	jsonBytes, err := json.Marshal(data)
+	if err != nil {
+		return "", err
+	}
+	return string(jsonBytes), nil
 }
