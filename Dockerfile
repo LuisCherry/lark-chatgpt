@@ -1,4 +1,4 @@
-FROM golang:latest AS builder
+FROM golang AS golang
 
 ENV GO111MODULE=on \
     CGO_ENABLED=1 \
