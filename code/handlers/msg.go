@@ -387,43 +387,36 @@ MessageCardElement {
 //}
 
 func replyMsg(ctx context.Context, msg string, msgId *string) error {
-	fmt.Println("sendMsg", msg, msgId)
-	msg, err := processMessage(msg)
-	if err != nil {
-		return err
-	}
-
 	client := initialization.GetLarkClient()
 
-	// 构建 Markdown 格式消息内容
-	content := fmt.Sprintf(`{
-        "text": "%s",
-        "tag": "markdown"
-    }`, escapeJSONString(msg)) // 注意转义特殊字符
+	// 构建卡片消息内容（JSON 格式）
+	cardContent := fmt.Sprintf(`{
+        "config": { "wide_screen_mode": true },
+        "elements": [{
+            "tag": "markdown",
+            "content": "%s"
+        }]
+    }`, escapeJSONString(msg))
 
-	// 使用 MsgType = "markdown" 而不是 "text"
 	resp, err := client.Im.Message.Reply(ctx, larkim.NewReplyMessageReqBuilder().
 		MessageId(*msgId).
 		Body(larkim.NewReplyMessageReqBodyBuilder().
-			MsgType("markdown"). // 关键修改：指定消息类型为 markdown
+			MsgType("interactive"). // 关键：使用卡片消息类型
 			Uuid(uuid.New().String()).
-			Content(content).
+			Content(cardContent).
 			Build()).
 		Build())
 
 	if err != nil {
-		fmt.Println("API Error:", err)
-		return err
+		return fmt.Errorf("API error: %v", err)
 	}
-
 	if !resp.Success() {
-		fmt.Println("Server Error:", resp.Code, resp.Msg, resp.RequestId())
-		return fmt.Errorf("server error: %s", resp.Msg)
+		return fmt.Errorf("server error: %s (code: %d)", resp.Msg, resp.Code)
 	}
 	return nil
 }
 
-// 辅助函数：转义字符串中的特殊字符（如引号、换行符等）
+// 转义 JSON 特殊字符
 func escapeJSONString(s string) string {
 	s = strings.ReplaceAll(s, `"`, `\"`)
 	s = strings.ReplaceAll(s, "\n", `\n`)
