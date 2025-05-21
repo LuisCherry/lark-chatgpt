@@ -624,18 +624,50 @@ func sendPicModeCheckCard(ctx context.Context,
 	)
 }
 
+//func sendNewTopicCard(ctx context.Context,
+//	sessionId *string, msgId *string, content string) {
+//	newCard, _ := newSendCard(
+//		withHeader("👻️ 已开启新的话题", larkcard.TemplateBlue),
+//		//withMainText(content),
+//		withMainMd(content),
+//		withNote("提醒：点击对话框参与回复，可保持话题连贯"))
+//	replyCard(
+//		ctx,
+//		msgId,
+//		newCard,
+//	)
+//}
+
 func sendNewTopicCard(ctx context.Context,
 	sessionId *string, msgId *string, content string) {
-	newCard, _ := newSendCard(
-		withHeader("👻️ 已开启新的话题", larkcard.TemplateBlue),
-		//withMainText(content),
-		withMainMd(content),
-		withNote("提醒：点击对话框参与回复，可保持话题连贯"))
-	replyCard(
-		ctx,
-		msgId,
-		newCard,
-	)
+
+	cardContent := fmt.Sprintf(`{
+		"config": { "wide_screen_mode": true },
+		"header": {
+			"title": {
+				"tag": "plain_text",
+				"content": "👻️ 已开启新的话题"
+			},
+			"template": "blue"
+		},
+		"elements": [
+			{
+				"tag": "markdown",
+				"content": "%s"
+			},
+			{
+				"tag": "note",
+				"elements": [
+					{
+						"tag": "plain_text",
+						"content": "提醒：点击对话框参与回复，可保持话题连贯"
+					}
+				]
+			}
+		]
+	}`, escapeJSONString(content))
+
+	_ = replyCard(ctx, msgId, cardContent)
 }
 
 func sendHelpCard(ctx context.Context,
