@@ -215,6 +215,8 @@ func (*MessageAction) Execute(a *ActionInfo) bool {
 	msg = append(msg, openai.Messages{
 		Role: "user", Content: a.info.qParsed,
 	})
+	fmt.Println("sessionId:", *a.info.sessionId)
+	fmt.Println("msg:", msg)
 	completions, err := a.handler.gpt.Completions(msg)
 	if err != nil {
 		replyMsg(*a.ctx, fmt.Sprintf(

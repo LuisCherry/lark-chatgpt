@@ -125,7 +125,7 @@ func withSplitLine() larkcard.MessageCardElement {
 
 // withHeader 用于生成消息头
 func withHeader(title string, color string) *larkcard.
-	MessageCardHeader {
+MessageCardHeader {
 	if title == "" {
 		title = "🤖️机器人提醒"
 	}
@@ -198,7 +198,7 @@ func withImageDiv(imageKey string) larkcard.MessageCardElement {
 
 // withMdAndExtraBtn 用于生成带有额外按钮的消息体
 func withMdAndExtraBtn(msg string, btn *larkcard.
-	MessageCardEmbedButton) larkcard.MessageCardElement {
+MessageCardEmbedButton) larkcard.MessageCardElement {
 	msg, i := processMessage(msg)
 	msg = processNewLine(msg)
 	if i != nil {
@@ -220,7 +220,7 @@ func withMdAndExtraBtn(msg string, btn *larkcard.
 
 func newBtn(content string, value map[string]interface{},
 	typename larkcard.MessageCardButtonType) *larkcard.
-	MessageCardEmbedButton {
+MessageCardEmbedButton {
 	btn := larkcard.NewMessageCardEmbedButton().
 		Type(typename).
 		Value(value).
@@ -235,7 +235,7 @@ func newMenu(
 	value map[string]interface{},
 	options ...MenuOption,
 ) *larkcard.
-	MessageCardEmbedSelectMenuStatic {
+MessageCardEmbedSelectMenuStatic {
 	var aOptionPool []*larkcard.MessageCardEmbedSelectOption
 	for _, option := range options {
 		aOption := larkcard.NewMessageCardEmbedSelectOption().
@@ -284,7 +284,7 @@ func withClearDoubleCheckBtn(sessionID *string) larkcard.MessageCardElement {
 }
 
 func withPicModeDoubleCheckBtn(sessionID *string) larkcard.
-	MessageCardElement {
+MessageCardElement {
 	confirmBtn := newBtn("切换模式", map[string]interface{}{
 		"value":     "1",
 		"kind":      PicModeChangeKind,
@@ -309,7 +309,7 @@ func withPicModeDoubleCheckBtn(sessionID *string) larkcard.
 }
 
 func withOneBtn(btn *larkcard.MessageCardEmbedButton) larkcard.
-	MessageCardElement {
+MessageCardElement {
 	actions := larkcard.NewMessageCardAction().
 		Actions([]larkcard.MessageCardActionElement{btn}).
 		Layout(larkcard.MessageCardActionLayoutFlow.Ptr()).
@@ -320,7 +320,7 @@ func withOneBtn(btn *larkcard.MessageCardEmbedButton) larkcard.
 //新建对话按钮
 
 func withPicResolutionBtn(sessionID *string) larkcard.
-	MessageCardElement {
+MessageCardElement {
 	cancelMenu := newMenu("默认分辨率",
 		map[string]interface{}{
 			"value":     "0",
@@ -550,7 +550,8 @@ func sendSystemInstructionCard(ctx context.Context,
 	sessionId *string, msgId *string, content string) {
 	newCard, _ := newSendCard(
 		withHeader("🥷  已进入角色扮演模式", larkcard.TemplateBlue),
-		withMainText(content),
+		//withMainText(content),
+		withMainMd(content),
 		withNote("请注意，这将开始一个全新的对话，您将无法利用之前话题的历史信息"))
 	replyCard(
 		ctx,
@@ -590,7 +591,8 @@ func sendNewTopicCard(ctx context.Context,
 	sessionId *string, msgId *string, content string) {
 	newCard, _ := newSendCard(
 		withHeader("👻️ 已开启新的话题", larkcard.TemplateBlue),
-		withMainText(content),
+		//withMainText(content),
+		withMainMd(content),
 		withNote("提醒：点击对话框参与回复，可保持话题连贯"))
 	replyCard(
 		ctx,
@@ -603,7 +605,7 @@ func sendHelpCard(ctx context.Context,
 	sessionId *string, msgId *string) {
 	newCard, _ := newSendCard(
 		withHeader("🎒需要帮助吗？", larkcard.TemplateBlue),
-		withMainMd("**我是小飞机，一款基于chatGpt技术的智能聊天机器人！**"),
+		withMainMd("**我是小飞机，一款基于AI技术的智能聊天机器人！**"),
 		withSplitLine(),
 		withMdAndExtraBtn(
 			"** 🆑 清除话题上下文**\n文本回复 *清除* 或 */clear*",
