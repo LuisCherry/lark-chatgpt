@@ -352,42 +352,82 @@ MessageCardElement {
 
 }
 
+//func replyMsg(ctx context.Context, msg string, msgId *string) error {
+//	fmt.Println("sendMsg", msg, msgId)
+//	msg, i := processMessage(msg)
+//	if i != nil {
+//		return i
+//	}
+//	client := initialization.GetLarkClient()
+//	content := larkim.NewTextMsgBuilder().
+//		Text(msg).
+//		Build()
+//
+//	resp, err := client.Im.Message.Reply(ctx, larkim.NewReplyMessageReqBuilder().
+//		MessageId(*msgId).
+//		Body(larkim.NewReplyMessageReqBodyBuilder().
+//			MsgType(larkim.MsgTypeText).
+//			Uuid(uuid.New().String()).
+//			Content(content).
+//			Build()).
+//		Build())
+//
+//	// 处理错误
+//	if err != nil {
+//		fmt.Println(err)
+//		return err
+//	}
+//
+//	// 服务端错误处理
+//	if !resp.Success() {
+//		fmt.Println(resp.Code, resp.Msg, resp.RequestId())
+//		return err
+//	}
+//	return nil
+//}
+
 func replyMsg(ctx context.Context, msg string, msgId *string) error {
 	fmt.Println("sendMsg", msg, msgId)
-	msg, i := processMessage(msg)
-	if i != nil {
-		return i
-	}
-	client := initialization.GetLarkClient()
-	contentStr, err := convertMarkdownToLarkPostJson(msg)
+	msg, err := processMessage(msg)
 	if err != nil {
 		return err
 	}
-	//content := larkim.NewTextMsgBuilder().
-	//	Text(msg).
-	//	Build()
 
+	client := initialization.GetLarkClient()
+
+	// 构建 Markdown 格式消息内容
+	content := fmt.Sprintf(`{
+        "text": "%s",
+        "tag": "markdown"
+    }`, escapeJSONString(msg)) // 注意转义特殊字符
+
+	// 使用 MsgType = "markdown" 而不是 "text"
 	resp, err := client.Im.Message.Reply(ctx, larkim.NewReplyMessageReqBuilder().
 		MessageId(*msgId).
 		Body(larkim.NewReplyMessageReqBodyBuilder().
-			MsgType(larkim.MsgTypeText).
+			MsgType("markdown"). // 关键修改：指定消息类型为 markdown
 			Uuid(uuid.New().String()).
-			Content(contentStr).
+			Content(content).
 			Build()).
 		Build())
 
-	// 处理错误
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println("API Error:", err)
 		return err
 	}
 
-	// 服务端错误处理
 	if !resp.Success() {
-		fmt.Println(resp.Code, resp.Msg, resp.RequestId())
-		return err
+		fmt.Println("Server Error:", resp.Code, resp.Msg, resp.RequestId())
+		return fmt.Errorf("server error: %s", resp.Msg)
 	}
 	return nil
+}
+
+// 辅助函数：转义字符串中的特殊字符（如引号、换行符等）
+func escapeJSONString(s string) string {
+	s = strings.ReplaceAll(s, `"`, `\"`)
+	s = strings.ReplaceAll(s, "\n", `\n`)
+	return s
 }
 
 func uploadImage(base64Str string) (*string, error) {
