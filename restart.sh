@@ -14,11 +14,17 @@ cd /media/nvme/data/lark-chat || { echo "目录不存在"; exit 1; }
 echo "拉取最新代码..."
 git pull
 
-# 4. 构建 Docker 镜像
+# 4. 删除旧的镜像
+if docker images -q feishu-chatgpt:latest > /dev/null; then
+    echo "删除旧的镜像 feishu-chatgpt:latest..."
+    docker rmi feishu-chatgpt:latest
+fi
+
+# 5. 构建 Docker 镜像
 echo "构建镜像..."
 docker build -t feishu-chatgpt:latest .
 
-# 5. 启动容器
+# 6. 启动容器
 echo "启动容器..."
 docker run -d --name feishu-chatgpt -p 7000:9000 \
     --env APP_ID=cli_a8a6907d60b81029 \
@@ -32,6 +38,6 @@ docker run -d --name feishu-chatgpt -p 7000:9000 \
     --env MODEL="deepseek-chat" \
     feishu-chatgpt:latest
 
-# 6. 打印容器日志
+# 7. 打印容器日志
 echo "容器启动成功，正在查看日志..."
 docker logs -f feishu-chatgpt
