@@ -113,143 +113,24 @@ kill -9 PID
 </details>
 
 <details>
-    <summary>serverless云函数(阿里云等)部署</summary>
-<br>
-
-```bash
-git clone git@github.com:Leizhenpeng/feishu-chatgpt.git
-cd feishu-chatgpt/code
-```
-
-安装[severless](https://docs.serverless-devs.com/serverless-devs/quick_start)工具
-
-```bash
-# 配置config.yaml
-mv config.example.yaml config.yaml
-# 安装severless cli
-npm install @serverless-devs/s -g
-```
-
-安装完成后，请根据您本地环境，根据下面教程部署`severless`
-
-- 本地 `linux`/`mac os` 环境
-
-1. 修改`s.yaml`中的部署地区和部署秘钥
-
-```
-edition: 1.0.0
-name: feishuBot-chatGpt
-access: "aliyun" #  修改自定义的秘钥别称
-
-vars: # 全局变量
-region: "cn-hongkong" # 修改云函数想要部署地区
-
-```
-
-2. 一键部署
-
-```bash
-cd ..
-s deploy
-```
-
-- 本地`windows`
-
-1. 首先打开本地`cmd`命令提示符工具，运行`go env`检查你电脑上 go 环境变量设置, 确认以下变量和值
-
-```cmd
-set GO111MODULE=on
-set GOARCH=amd64
-set GOOS=linux
-set CGO_ENABLED=0
-```
-
-如果值不正确，比如您电脑上为`set GOOS=windows`, 请运行以下命令设置`GOOS`变量值
-
-```cmd
-go env -w GOOS=linux
-```
-
-2. 修改`s.yaml`中的部署地区和部署秘钥
-
-```
-edition: 1.0.0
-name: feishuBot-chatGpt
-access: "aliyun" #  修改自定义的秘钥别称
-
-vars: # 全局变量
-  region: "cn-hongkong" #  修改云函数想要部署地区
-
-```
-
-3. 修改`s.yaml`中的`pre-deploy`, 去除第二步`run`前面的环变量改置部分
-
-```
-  pre-deploy:
-        - run: go mod tidy
-          path: ./code
-        - run: go build -o
-            target/main main.go  # 删除GO111MODULE=on GOOS=linux GOARCH=amd64 CGO_ENABLED=0
-          path: ./code
-
-```
-
-4. 一键部署
-
-```bash
-cd ..
-s deploy
-```
-
-更多详细介绍，参考[仅需 1min，用 Serverless 部署基于 gin 的飞书机器人](https://www.bilibili.com/video/BV1nW4y1378T/)
-<br>
-</details>
-
-<details>
-    <summary>使用 Railway 平台一键部署</summary>
-
-
-Railway 是一家国外的 Serverless 平台，支持多种语言，可以一键将 Github 上的代码仓库部署到 Railway 平台，然后在 Railway 平台上配置环境变量即可。部署本项目的流程如下：
-
-#### 1. 生成 Railway 项目
-
-点击下方按钮即可创建一个对应的 Railway 项目，其会自动 Fork 本项目到你的 Github 账号下。
-
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/10D-TF?referralCode=oMcVS2)
-
-#### 2. 配置环境变量
-
-在打开的页面中，配置环境变量，每个变量的说明如下图所示：
-
-
-<img src='https://user-images.githubusercontent.com/50035229/225005602-88d8678f-9d17-4dc5-8d1e-4abf64fb84fd.png' alt='Railway 环境变量' width='500px'/>
-
-#### 3. 部署项目
-
-填写完环境变量后，点击 Deploy 就完成了项目的部署。部署完成后还需获取对应的域名用于飞书机器人访问，如下图所示：
-
-<img src='https://user-images.githubusercontent.com/50035229/225006236-57cb3c8a-1b7d-4bfe-9c9b-099cb9179027.png' alt='Railway 域名' width='500px'/>
-
-如果不确定自己部署是否成功，可以通过访问上述获取到的域名 (https://xxxxxxxx.railway.app/ping) 来查看是否返回了`pong`，如果返回了`pong`，说明部署成功。
-
-</details>
-
-<details>
     <summary>docker部署</summary>
 <br>
 
 ```bash
-docker build -t feishu-chatgpt:latest .
-docker run -d --name feishu-chatgpt -p 9000:9000 \
---env APP_ID=xxx \
---env APP_SECRET=xxx \
---env APP_ENCRYPT_KEY=xxx \
---env APP_VERIFICATION_TOKEN=xxx \
---env BOT_NAME=chatGpt \
---env OPENAI_KEY="sk-xxx1,sk-xxx2,sk-xxx3" \
---env API_URL="https://api.openai.com" \
---env HTTP_PROXY="" \
-feishu-chatgpt:latest
+  docker build -t feishu-chatgpt:latest .
+```
+```bash
+    docker run -d --name feishu-chatgpt -p 7000:9000 \
+    --env APP_ID=cli_a8a6907d60b81029 \
+    --env APP_SECRET=AvA98VCzp4nK8VMTzeCE5dcscshcJRq8 \
+    --env APP_ENCRYPT_KEY=8wp9f7lWOqyViSTniRL93gLbLFNS1Qnv \
+    --env APP_VERIFICATION_TOKEN=jYEr3PuR1bgEWyIR818eIh0YSVxCHFsO \
+    --env BOT_NAME=chatGpt \
+    --env OPENAI_KEY="sk-895e2ca99ab04024a7c468f68797554a" \
+    --env API_URL="https://api.deepseek.com" \
+    --env HTTP_PROXY="" \
+    --env MODEL="deepseek-chat" \
+    feishu-chatgpt:latest
 ```
 注意:
 - `BOT_NAME` 为飞书机器人名称，例如 `chatGpt`
@@ -258,41 +139,11 @@ feishu-chatgpt:latest
 - `API_URL` 为openai api 接口地址，例如 `https://api.openai.com`, 没有反向代理的话，可以不用设置
 ---
 
-小白简易化 docker 部署
-
-- docker 地址: https://hub.docker.com/r/leizhenpeng/feishu-chatgpt
-
-```bash
-docker run -d --restart=always --name feishu-chatgpt2 -p 9000:9000 -v /etc/localtime:/etc/localtim:ro  \
---env APP_ID=xxx \
---env APP_SECRET=xxx \
---env APP_ENCRYPT_KEY=xxx \
---env APP_VERIFICATION_TOKEN=xxx \
---env BOT_NAME=chatGpt \
---env OPENAI_KEY="sk-xxx1,sk-xxx2,sk-xxx3" \
---env API_URL=https://api.openai.com \
---env HTTP_PROXY="" \
-dockerproxy.com/leizhenpeng/feishu-chatgpt:latest
-```
-
 事件回调地址: http://IP:9000/webhook/event
 卡片回调地址: http://IP:9000/webhook/card
 
 把它填入飞书后台
 <br>
-
-</details>
-
-<details>
-    <summary>二进制安装包部署</summary>
-<br>
-
-1. 进入[release 页面](https://github.com/Leizhenpeng/feishu-chatgpt/releases/) 下载对应的安装包
-2. 解压安装包,修改 config.example.yml 中配置信息,另存为 config.yml
-3. 运行程序入口文件 `feishu-chatgpt`
-
-事件回调地址: http://IP:9000/webhook/event
-卡片回调地址: http://IP:9000/webhook/card
 
 </details>
 
@@ -346,22 +197,4 @@ dockerproxy.com/leizhenpeng/feishu-chatgpt:latest
  
 
 5. 发布版本，等待企业管理员审核通过
-
-更多介绍，参考[飞书上的小计算器: Go 机器人来啦](https://www.bilibili.com/video/BV12M41187rV/)
-
-## 更多交流
-
-如需协助部署，或者其他定制服务，可联系下面的WeChat，支持发票~
-
-遇到问题，可以加入飞书群沟通~
-
-<img src='./docs/talk.png' alt='' width='200'/>
-
-## 交朋友 或者 鼓励一下
-
-如果你觉得这个项目对你有帮助，可以请作者买本书~
-
-<img width="400" src="https://user-images.githubusercontent.com/50035229/224462896-28f7b2d5-f443-4cc2-9790-7b72e5c53f15.png">
-
-😚 谢谢你啦 😚
 
