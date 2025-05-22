@@ -15,30 +15,18 @@ echo "拉取最新代码..."
 git pull
 
 # 4. 删除旧的镜像
-if docker images -q feishu-chatgpt:latest > /dev/null; then
-    echo "删除旧的镜像 feishu-chatgpt:latest..."
-    docker rmi feishu-chatgpt:latest
-fi
+#if docker images -q feishu-chatgpt:latest > /dev/null; then
+#    echo "删除旧的镜像 feishu-chatgpt:latest..."
+#    docker rmi feishu-chatgpt:latest
+#fi
 
 # 5. 构建 Docker 镜像
-echo "构建镜像..."
-docker build -t feishu-chatgpt:latest .
+#echo "构建镜像..."
+#docker build -t feishu-chatgpt:latest .
 
 # 6. 启动容器
 echo "启动容器..."
 ## 官方
-#docker run -d --name feishu-chatgpt -p 7000:9000 \
-#    --env APP_ID=cli_a8a6907d60b81029 \
-#    --env APP_SECRET=AvA98VCzp4nK8VMTzeCE5dcscshcJRq8 \
-#    --env APP_ENCRYPT_KEY=8wp9f7lWOqyViSTniRL93gLbLFNS1Qnv \
-#    --env APP_VERIFICATION_TOKEN=jYEr3PuR1bgEWyIR818eIh0YSVxCHFsO \
-#    --env BOT_NAME=chatGpt \
-#    --env OPENAI_KEY="sk-895e2ca99ab04024a7c468f68797554a" \
-#    --env API_URL="https://api.deepseek.com" \
-#    --env HTTP_PROXY="" \
-#    --env MODEL="deepseek-chat" \
-#    feishu-chatgpt:latest
-## H20
 docker run -d --name feishu-chatgpt -p 7000:9000 \
     --env APP_ID=cli_a8a6907d60b81029 \
     --env APP_SECRET=AvA98VCzp4nK8VMTzeCE5dcscshcJRq8 \
@@ -46,10 +34,22 @@ docker run -d --name feishu-chatgpt -p 7000:9000 \
     --env APP_VERIFICATION_TOKEN=jYEr3PuR1bgEWyIR818eIh0YSVxCHFsO \
     --env BOT_NAME=chatGpt \
     --env OPENAI_KEY="sk-895e2ca99ab04024a7c468f68797554a" \
-    --env API_URL="https://deepseek.icool.gold" \
+    --env API_URL="https://api.deepseek.com" \
     --env HTTP_PROXY="" \
-    --env MODEL="deepseek-ai/DeepSeek-V3" \
+    --env MODEL="deepseek-chat" \
     feishu-chatgpt:latest
+## H20
+#docker run -d --name feishu-chatgpt -p 7000:9000 \
+#    --env APP_ID=cli_a8a6907d60b81029 \
+#    --env APP_SECRET=AvA98VCzp4nK8VMTzeCE5dcscshcJRq8 \
+#    --env APP_ENCRYPT_KEY=8wp9f7lWOqyViSTniRL93gLbLFNS1Qnv \
+#    --env APP_VERIFICATION_TOKEN=jYEr3PuR1bgEWyIR818eIh0YSVxCHFsO \
+#    --env BOT_NAME=chatGpt \
+#    --env OPENAI_KEY="sk-895e2ca99ab04024a7c468f68797554a" \
+#    --env API_URL="https://deepseek.icool.gold" \
+#    --env HTTP_PROXY="" \
+#    --env MODEL="deepseek-ai/DeepSeek-V3" \
+#    feishu-chatgpt:latest
 
 # 7. 打印容器日志
 echo "容器启动成功，正在查看日志..."
