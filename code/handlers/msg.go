@@ -125,7 +125,7 @@ func withSplitLine() larkcard.MessageCardElement {
 
 // withHeader 用于生成消息头
 func withHeader(title string, color string) *larkcard.
-MessageCardHeader {
+	MessageCardHeader {
 	if title == "" {
 		title = "🤖️机器人提醒"
 	}
@@ -198,7 +198,7 @@ func withImageDiv(imageKey string) larkcard.MessageCardElement {
 
 // withMdAndExtraBtn 用于生成带有额外按钮的消息体
 func withMdAndExtraBtn(msg string, btn *larkcard.
-MessageCardEmbedButton) larkcard.MessageCardElement {
+	MessageCardEmbedButton) larkcard.MessageCardElement {
 	msg, i := processMessage(msg)
 	msg = processNewLine(msg)
 	if i != nil {
@@ -220,7 +220,7 @@ MessageCardEmbedButton) larkcard.MessageCardElement {
 
 func newBtn(content string, value map[string]interface{},
 	typename larkcard.MessageCardButtonType) *larkcard.
-MessageCardEmbedButton {
+	MessageCardEmbedButton {
 	btn := larkcard.NewMessageCardEmbedButton().
 		Type(typename).
 		Value(value).
@@ -235,7 +235,7 @@ func newMenu(
 	value map[string]interface{},
 	options ...MenuOption,
 ) *larkcard.
-MessageCardEmbedSelectMenuStatic {
+	MessageCardEmbedSelectMenuStatic {
 	var aOptionPool []*larkcard.MessageCardEmbedSelectOption
 	for _, option := range options {
 		aOption := larkcard.NewMessageCardEmbedSelectOption().
@@ -284,7 +284,7 @@ func withClearDoubleCheckBtn(sessionID *string) larkcard.MessageCardElement {
 }
 
 func withPicModeDoubleCheckBtn(sessionID *string) larkcard.
-MessageCardElement {
+	MessageCardElement {
 	confirmBtn := newBtn("切换模式", map[string]interface{}{
 		"value":     "1",
 		"kind":      PicModeChangeKind,
@@ -309,7 +309,7 @@ MessageCardElement {
 }
 
 func withOneBtn(btn *larkcard.MessageCardEmbedButton) larkcard.
-MessageCardElement {
+	MessageCardElement {
 	actions := larkcard.NewMessageCardAction().
 		Actions([]larkcard.MessageCardActionElement{btn}).
 		Layout(larkcard.MessageCardActionLayoutFlow.Ptr()).
@@ -320,7 +320,7 @@ MessageCardElement {
 //新建对话按钮
 
 func withPicResolutionBtn(sessionID *string) larkcard.
-MessageCardElement {
+	MessageCardElement {
 	cancelMenu := newMenu("默认分辨率",
 		map[string]interface{}{
 			"value":     "0",
