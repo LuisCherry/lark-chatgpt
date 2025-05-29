@@ -8,21 +8,21 @@ if docker ps -q -f name=feishu-chatgpt > /dev/null; then
 fi
 
 # 2. 进入指定目录
-cd /media/nvme/data/lark-chat || { echo "目录不存在"; exit 1; }
+cd /media/nvme/data/lark-chatgpt || { echo "目录不存在"; exit 1; }
 
 # 3. 拉取最新代码
 echo "拉取最新代码..."
 git pull
 
 # 4. 删除旧的镜像
-#if docker images -q feishu-chatgpt:latest > /dev/null; then
-#    echo "删除旧的镜像 feishu-chatgpt:latest..."
-#    docker rmi feishu-chatgpt:latest
-#fi
+if docker images -q feishu-chatgpt:latest > /dev/null; then
+    echo "删除旧的镜像 feishu-chatgpt:latest..."
+    docker rmi feishu-chatgpt:latest
+fi
 
 # 5. 构建 Docker 镜像
-#echo "构建镜像..."
-#docker build -t feishu-chatgpt:latest .
+echo "构建镜像..."
+docker build -t feishu-chatgpt:latest .
 
 # 6. 启动容器
 echo "启动容器..."
